@@ -1,0 +1,41 @@
+pipeline {
+    agent {label "slav1"}
+    parameters {
+        string(name: 'PERSON', defaultValue: 'Mr Jenkins', 
+        description: 'Who should I say hello to?')
+
+      
+        password(name: 'PASSWORD', defaultValue: 'SECRET', 
+        description: 'Enter a password')
+    }
+    stages {
+        stage('Example') {
+            steps {
+                echo "Hello ${params.PERSON}"
+                echo "Password: ${params.PASSWORD}"
+            }
+        }
+         stage('git') {
+            steps {
+               git branch: 'main', url: 'https://github.com/krishna-gbu/jenkinsRevision.git'
+            }
+        }
+        
+         stage('DOCKER IAMGE BUILD AND PUBLIC') {
+            steps {
+               sh "sudo docker image build -t reactjs:${BUILD_NUMBER} --progress=plain ."
+               sh "sudo docker image tag reactjs:${BUILD_NUMBER} krish00/${BUILD_NUMBER}"
+               sh "sudo docker container run -itd  -p 80:3000 krish00/${BUILD_NUMBER}"
+            }
+        }
+        stage('DOCKER IMAGE PUSH TO DOCKER HUB') {
+            steps {
+              withCredentials([string(credentialsId: 'DOCKER_HUB_PASS_CODE', variable: 'DOCKER_HUB_PASS')])
+              {   
+                sh "sudo docker login -u krish00 -p ${DOCKER_HUB_PASS}"
+              }
+                sh "sudo docker image push krish00/${BUILD_NUMBER}"
+            }
+        }
+    }
+}
