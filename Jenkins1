@@ -1,0 +1,23 @@
+pipeline{
+
+  agent {label "slav1"}
+
+  stages{
+
+      stage('scm'){
+          
+       steps{
+             git 'https://github.com/krishna-gbu/jenkinsRevision.git'
+            }
+      } 
+
+    stage('install package'){
+          
+       steps{
+             sh 'sudo docker build -t reactjsimage .'
+            }
+      } 
+  }
+
+}
+

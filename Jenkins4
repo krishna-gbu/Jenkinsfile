@@ -1,0 +1,23 @@
+pipeline{
+
+  agent {label "slav1"}
+
+  stages{
+
+      stage('scm'){
+          
+       steps{
+             git branch: 'main', url: 'https://github.com/krishna-gbu/jenkinsRevision.git'
+            }
+      } 
+
+    stage('image build'){
+          
+       steps{
+             sh 'sudo docker build -t reactjsimage .'
+             sh 'sudo docker container run -d -p 80:3000 reactjsimage'
+            }
+      } 
+  }
+
+}
